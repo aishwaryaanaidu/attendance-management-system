@@ -1,7 +1,5 @@
 const db = require("../config/database");
 
-// ==> Método responsável por criar um novo 'Product':
-
 exports.createUser = async (req, res) => {
   const { fname, lname, email_id, password, student } = req.body;
   const { rows } = await db.query(
