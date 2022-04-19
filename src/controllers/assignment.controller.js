@@ -66,15 +66,48 @@ exports.getAssignments = async (req, res) => {
 //     })
 // };
 
-exports.getAssignmentsAssociatedWithCourse = async (req, res) => {
+exports.getAssignmentsAssociatedWithStudent = async (req, res) => {
   const student_id = parseInt(req.params.id);
   const { rows } = await db.query(
-  "SELECT assignment.assignment_id, assignment.assignment_name, assignment.assignment_description, submissions.submission_id, submissions.status, submissions.grade, submissions.files FROM assignment INNER JOIN submissions ON cast(submissions.assignment_id as int)=assignment.assignment_id WHERE submissions.student_id=$1",
+  "SELECT assignment.assignment_id, assignment.assignment_name, assignment.assignment_description, submissions.submission_id, submissions.status, submissions.grade, submissions.files, courses.course_name FROM assignment INNER JOIN submissions ON cast(submissions.assignment_id as int)=assignment.assignment_id INNER JOIN courses ON cast(courses.course_id as int)=assignment.course_id WHERE submissions.student_id=$1",
     [student_id]
   );
   console.log(rows);
+  result = []
+  status = ["OPEN", "IN PROGRESS", "RESOLVED", "BLOCKED"]
+  status.forEach(item => {
+    let temp = {
+      id: item,
+      title: item,
+      label: item,
+      cards: []
+    }
+    rows.forEach(row => {
+      if(row.status == item) {
+        temp.cards.push({
+          id: row.submission_id,
+          title: row.assignment_name,
+          description: row.assignment_description,
+          label: row.course_name
+        })
+      }
+    })
+    result.push(temp)
+  })
+  
   res.status(200).send({
       message: "Assignments fetched successfully",
-      courses: rows
+      courses: result
   })
 };
+
+// lanes: [
+//     {
+//       id: status,
+//       title: status,
+//       label: '2/2',
+//       cards: [
+//         {id: submission_id, title: assignment name, description: assignment description, label: course name, draggable: false},
+//         {id: 'Card2', title: 'Pay Rent', description: 'Transfer via NEFT', label: '5 mins', metadata: {sha: 'be312a1'}}
+//       ]
+//     }
