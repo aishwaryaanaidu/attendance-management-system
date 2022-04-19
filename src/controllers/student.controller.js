@@ -2,7 +2,8 @@ const db = require("../config/database");
 const axios = require('axios');
 
 exports.getCourses = async (req, res) => {
-    const { student_id } = req.body;
+    // const { student_id } = req.body;
+    const student_id = parseInt(req.params.id);
     const { rows } = await db.query(
       "SELECT list_of_courses FROM student WHERE student_id = $1",
       [student_id]

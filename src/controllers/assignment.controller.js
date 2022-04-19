@@ -29,7 +29,8 @@ exports.createAssignment = async (req, res) => {
   };
 
 exports.getStudents = async (req, res) => {
-    const { course_id } = req.body;
+    // const { course_id } = req.body;
+    const course_id = parseInt(req.params.id);
     const { rows } = await db.query(
       "SELECT * FROM student WHERE $1=ANY(list_of_courses)",
       [course_id]
@@ -37,9 +38,7 @@ exports.getStudents = async (req, res) => {
     console.log("course", rows);
     res.status(201).send({
       message: "User added successfully!",
-      body: {
-        user: rows
-      },
+      user: rows
     });
   };
 
@@ -54,15 +53,28 @@ exports.getAssignments = async (req, res) => {
     });
 }
 
+// exports.getAssignmentsAssociatedWithCourse = async (req, res) => {
+//     const { course_id, student_id } = req.body;
+//     const { rows } = await db.query(
+//     "SELECT assignment.assignment_id, assignment.assignment_name, assignment.assignment_description, submissions.submission_id, submissions.status, submissions.grade, submissions.files FROM assignment INNER JOIN submissions ON cast(submissions.assignment_id as int)=assignment.assignment_id WHERE assignment.course_id=$1 AND submissions.student_id=$2",
+//       [course_id, student_id]
+//     );
+//     console.log(rows);
+//     res.status(200).send({
+//         message: "Assignments fetched successfully",
+//         courses: rows
+//     })
+// };
+
 exports.getAssignmentsAssociatedWithCourse = async (req, res) => {
-    const { course_id, student_id } = req.body;
-    const { rows } = await db.query(
-    "SELECT assignment.assignment_id, assignment.assignment_name, assignment.assignment_description, submissions.submission_id, submissions.status, submissions.grade, submissions.files FROM assignment INNER JOIN submissions ON cast(submissions.assignment_id as int)=assignment.assignment_id WHERE assignment.course_id=$1 AND submissions.student_id=$2",
-      [course_id, student_id]
-    );
-    console.log(rows);
-    res.status(200).send({
-        message: "Assignments fetched successfully",
-        courses: rows
-    })
+  const student_id = parseInt(req.params.id);
+  const { rows } = await db.query(
+  "SELECT assignment.assignment_id, assignment.assignment_name, assignment.assignment_description, submissions.submission_id, submissions.status, submissions.grade, submissions.files FROM assignment INNER JOIN submissions ON cast(submissions.assignment_id as int)=assignment.assignment_id WHERE submissions.student_id=$1",
+    [student_id]
+  );
+  console.log(rows);
+  res.status(200).send({
+      message: "Assignments fetched successfully",
+      courses: rows
+  })
 };
