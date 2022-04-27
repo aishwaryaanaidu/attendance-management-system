@@ -10,15 +10,17 @@ exports.createAssignment = async (req, res) => {
         [course_id, assignment_name, assignment_description]
     );
     console.log("details", rows);
-    const student_response = await axios.post("http://localhost:3000/api/assignment/get_students", {course_id: course_id});
-    let students = student_response.data.body.user;
-    console.log("students", student_response.data.body.user);
+    // const student_response = await axios.post("http://localhost:3001/api/assignment/get_students", {course_id: course_id});
+    const student_response = await axios.get(`http://localhost:3001/api/assignment/get_students/${course_id}`);
+    let students = student_response.data.user;
+    // let students = parseInt(req.params.course_id);
+    console.log("students", student_response.data.user);
     let items = [];
     students.forEach(student => {
         items.push([rows[0].assignment_id, student.student_id, "OPEN", null, ""]);
     });
-    console.log("students", student_response.data.body.user);
-    const assignment_response = await axios.post("http://localhost:3000/api/assignment/get_assignments", {items: items});
+    console.log("students", student_response.data.user);
+    const assignment_response = await axios.post("http://localhost:3001/api/assignment/get_assignments", {items: items});
     console.log("assignment", assignment_response.data.message)
     res.status(201).send({
       message: "Assignment created successfully!",
@@ -80,7 +82,9 @@ exports.getAssignmentsAssociatedWithStudent = async (req, res) => {
       id: item,
       title: item,
       label: item,
-      cards: []
+      cards: [],
+      style: {backgroundColor: '#361460', color: 'white'},
+      cardStyle: { backgroundColor: 'yellow', color: 'black' }
     }
     rows.forEach(row => {
       if(row.status == item) {
@@ -97,17 +101,7 @@ exports.getAssignmentsAssociatedWithStudent = async (req, res) => {
   
   res.status(200).send({
       message: "Assignments fetched successfully",
-      courses: result
+      tickets: result
   })
 };
 
-// lanes: [
-//     {
-//       id: status,
-//       title: status,
-//       label: '2/2',
-//       cards: [
-//         {id: submission_id, title: assignment name, description: assignment description, label: course name, draggable: false},
-//         {id: 'Card2', title: 'Pay Rent', description: 'Transfer via NEFT', label: '5 mins', metadata: {sha: 'be312a1'}}
-//       ]
-//     }

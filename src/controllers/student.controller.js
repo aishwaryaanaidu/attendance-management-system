@@ -9,7 +9,7 @@ exports.getCourses = async (req, res) => {
       [student_id]
     );
     // console.log(rows);
-    const course_names = await axios.post("http://localhost:3000/api/student/get_course_names", {course_ids: rows[0].list_of_courses});
+    const course_names = await axios.post("http://localhost:3001/api/student/get_course_names", {course_ids: rows[0].list_of_courses});
     // console.log(course_names)
     res.status(200).send({
         message: "Courses fetched successfully",
